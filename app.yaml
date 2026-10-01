@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: motion-app
+  namespace: default
+spec:
+  replicas: 2  # 無停止アップデートのために2台構成にします！
+  selector:
+    matchLabels:
+      app: motion-app
+  template:
+    metadata:
+      labels:
+        app: motion-app
+    spec:
+      containers:
+      - name: frontend
+        # 先ほどGitHub Actionsでビルドしたイメージを指定
+        image: ghcr.io/parumenn/motion-k8s:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: motion-app
+  namespace: default
+spec:
+  selector:
+    app: motion-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
