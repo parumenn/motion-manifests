@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: motion-backend
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: motion-backend
+  template:
+    metadata:
+      labels:
+        app: motion-backend
+    spec:
+      containers:
+        - name: backend
+          image: ghcr.io/parumenn/motion-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            # ローカルのIPではなく、K8s内部のサービス名でPostgreSQLに直接接続させます
+            - name: DB_HOST
+              value: "postgres-svc"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USER
+              value: "motion"
+            - name: DB_PASSWORD
+              value: "motion_pass"
+            - name: DB_NAME
+              value: "motion_db"
+            - name: JWT_SECRET
+              value: "motion_super_secret_key_2026"
+          volumeMounts:
+            # Node.jsコンテナ内の /app/uploads を、Ubuntuサーバーの実体ディスクに直結
+            - mountPath: /app/uploads
+              name: uploads-data
+      volumes:
+        - name: uploads-data
+          hostPath:
+            path: /opt/motion/uploads
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: motion-backend-svc
+  namespace: default
+spec:
+  selector:
+    app: motion-backend
+  ports:
+    - port: 3000
+      targetPort: 3000
