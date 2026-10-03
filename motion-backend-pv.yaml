@@ -3,7 +3,7 @@ kind: PersistentVolume
 metadata:
   name: motion-backend-images-pv
 spec:
-  storageClassName: "MotionMainStorage" # ← 追加（空文字を指定して動的作成を回避）
+  storageClassName: "motion-main-storage"
   capacity:
     storage: 5Gi
   accessModes:
