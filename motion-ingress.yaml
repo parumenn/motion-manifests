@@ -13,14 +13,21 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: motion-backend
+            name: motion-backend-svc # ← 名前を合わせる
+            port:
+              number: 3000
+      - path: /uploads
+        pathType: Prefix
+        backend:
+          service:
+            name: motion-backend-svc
             port:
               number: 3000
       - path: /images
         pathType: Prefix
         backend:
           service:
-            name: motion-backend
+            name: motion-backend-svc
             port:
               number: 3000
       - path: /
