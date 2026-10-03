@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: motion-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: motion.parumenn.com
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: motion-backend
+            port:
+              number: 3000
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: motion-app
+            port:
+              number: 80
