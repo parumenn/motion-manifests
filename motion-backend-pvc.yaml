@@ -4,6 +4,7 @@ metadata:
   name: motion-backend-images-pvc
   namespace: default
 spec:
+  storageClassName: "MotionMainStorage" # ← 追加（PV側と一致させる）
   accessModes:
     - ReadWriteOnce
   resources:
