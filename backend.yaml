@@ -20,7 +20,6 @@ spec:
           ports:
             - containerPort: 3000
           env:
-            # ローカルのIPではなく、K8s内部のサービス名でPostgreSQLに直接接続させます
             - name: DB_HOST
               value: "postgres-svc"
             - name: DB_PORT
@@ -34,14 +33,12 @@ spec:
             - name: JWT_SECRET
               value: "motion_super_secret_key_2026"
           volumeMounts:
-            # Node.jsコンテナ内の /app/uploads を、Ubuntuサーバーの実体ディスクに直結
             - mountPath: /app/uploads
               name: uploads-data
       volumes:
         - name: uploads-data
-          hostPath:
-            path: /opt/motion/uploads
-            type: DirectoryOrCreate
+          persistentVolumeClaim:
+            claimName: motion-backend-images-pvc # ← hostPathからPVCに変更
 ---
 apiVersion: v1
 kind: Service
