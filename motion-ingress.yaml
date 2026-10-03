@@ -16,6 +16,13 @@ spec:
             name: motion-backend
             port:
               number: 3000
+      - path: /images
+        pathType: Prefix
+        backend:
+          service:
+            name: motion-backend
+            port:
+              number: 3000
       - path: /
         pathType: Prefix
         backend:
