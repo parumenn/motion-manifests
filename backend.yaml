@@ -21,7 +21,7 @@ spec:
             - containerPort: 3000
           env:
             - name: DB_HOST
-              value: "postgres-svc"
+              value: "postgres-svc.default.svc.cluster.local"
             - name: DB_PORT
               value: "5432"
             - name: DB_USER
