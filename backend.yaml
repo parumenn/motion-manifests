@@ -27,11 +27,46 @@ spec:
             - name: DB_USER
               value: "motion"
             - name: DB_PASSWORD
-              value: "motion_pass"
+              valueFrom:
+                secretKeyRef:
+                  name: motion-secrets
+                  key: db-password
             - name: DB_NAME
               value: "motion_db"
             - name: JWT_SECRET
-              value: "motion_super_secret_key_2026"
+              valueFrom:
+                secretKeyRef:
+                  name: motion-secrets
+                  key: jwt-secret
+            # 認証基盤（2026-11-16）: メール送信はマイボードと同一の Resend SMTP を
+            # motion-secrets 経由で共有する。値は Secret にのみ置く（Git に書かない）
+            - name: PUBLIC_BASE_URL
+              value: "https://motion.parumenn.com"
+            - name: SMTP_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: motion-secrets
+                  key: smtp-host
+            - name: SMTP_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: motion-secrets
+                  key: smtp-port
+            - name: SMTP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: motion-secrets
+                  key: smtp-user
+            - name: SMTP_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: motion-secrets
+                  key: smtp-pass
+            - name: MAIL_FROM
+              valueFrom:
+                secretKeyRef:
+                  name: motion-secrets
+                  key: mail-from
           volumeMounts:
             - mountPath: /app/uploads
               name: uploads-data
