@@ -4,7 +4,7 @@ metadata:
   name: motion-ingress
   namespace: default
 spec:
-  ingressClassName: nginx
+  ingressClassName: nginx-f5
   rules:
   - host: motion.parumenn.com
     http:
