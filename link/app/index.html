@@ -16,6 +16,11 @@
   .pbio { font-size:13px; line-height:1.5; margin-top:10px; white-space:pre-line; }
   .search { margin:22px 0 6px; }
   .search input { width:100%; padding:14px 16px; font-size:17px; border:2px solid var(--sage); border-radius:999px; outline:none; background:#fff; color:var(--brown); }
+  .field { position:relative; }
+  .field input { padding-left:18px; transition:border-color .18s ease, box-shadow .18s ease; }
+  .field input:focus { box-shadow:0 0 0 3px rgba(122,143,110,.18); }
+  .field label { position:absolute; left:12px; top:50%; transform:translateY(-50%); padding:0 6px; font-size:15px; color:#9a8a7a; pointer-events:none; white-space:nowrap; transition:top .18s ease, transform .18s ease, color .18s ease; }
+  .field input:focus + label, .field input:not(:placeholder-shown) + label { top:0; transform:translateY(-50%) scale(.8); transform-origin:left center; font-weight:700; color:var(--sage); background:var(--bg); }
   .search .hint { font-size:12px; opacity:.75; margin:8px 4px 0; }
   .results { margin-top:10px; display:flex; flex-direction:column; gap:10px; }
   .product { display:flex; gap:12px; align-items:center; background:#fff; border:1px solid var(--line); border-radius:14px; padding:10px; }
