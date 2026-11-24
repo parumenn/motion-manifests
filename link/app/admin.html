@@ -26,6 +26,8 @@ button.copy.small { background:var(--brown); font-size:12px; padding:7px 12px;}
 .cbadge.future { background:var(--sage);}
 .cbadge.overdue { background:#a33b3b;}
 .cbadge.done { background:#b9ab9c;}
+  .cbadge.idea { background:#8a7a9e;}
+  .placeholder { display:flex; align-items:center; justify-content:center; width:62%; max-width:280px; aspect-ratio:4/5; background:#f3ede4; border:1px dashed var(--sage); border-radius:12px; color:var(--brown); font-weight:700; font-size:15px; text-align:center; padding:16px; line-height:1.5; margin-bottom:8px;}
 .slides { display:flex; gap:8px; overflow-x:auto; padding-bottom:8px;}
 .slides img { width:62%; max-width:280px; aspect-ratio:4/5; object-fit:cover; border-radius:12px; flex:none; display:block;}
 .pids { display:flex; gap:6px; flex-wrap:wrap; margin:8px 0 2px;}
@@ -123,32 +125,45 @@ return t;
 }
 
 // 投稿の公開状態とバッジを決める
+// status: 'published'=投稿済み / 'scheduled'=投稿予定(制作済み) / 'idea'=企画段階
+// status が無い既存データは date が今日以前なら投稿済み、未来日付なら未投稿として扱う
 function resolvePost(post, today) {
 const d = parseLocalDate(post.date);
 const diff = d? Math.round((d - today) / 86400000): null;
+const isIdea = post.status === 'idea';
 let published;
 if (post.status === 'published') published = true;
-else if (post.status === 'scheduled') published = false;
-else published = diff === null? true: diff <= 0; // status無し: 今日以前=投稿済み / 未来=未投稿
+else if (post.status === 'scheduled' || isIdea) published = false;
+else published = diff === null? true: diff <= 0;
 let badge;
 if (published) badge = { text: '投稿済み', cls: 'done'};
+else if (isIdea) {
+let text = '企画中';
+if (diff === 0) text += '・今日';
+else if (diff!== null && diff > 0) text += `・あと${diff}日`;
+else if (diff!== null && diff < 0) text += '・日付経過';
+badge = { text, cls: 'idea'};
+}
 else if (diff === 0) badge = { text: '今日', cls: 'today'};
 else if (diff!== null && diff > 0) badge = { text: `あと${diff}日`, cls: 'future'};
 else badge = { text: '未投稿（日付経過）', cls: 'overdue'};
-return { published, diff, badge, dateObj: d};
+return { published, isIdea, diff, badge, dateObj: d};
 }
 
 const fbKey = postId => 'adminfb:' + postId;
 const fbText = post => `${post.post_id}（${post.theme}）：${(localStorage.getItem(fbKey(post.post_id)) || '').trim()}`;
 
 function cardHtml(post, info) {
-const dateLabel = post.date? post.date.replace(/-/g, '/'): '日付なし';
+const dateLabel = post.date? post.date.replace(/-/g, '/'): '未定';
 const kind = info.published? '投稿日': '投稿予定日';
+const slidesHtml = post.images && post.images.length
+? `<div class="slides">${post.images.map(src => `<img src="${src}" alt="" loading="lazy">`).join('')}</div>`
+: `<div class="placeholder"><span>${post.theme}</span></div>`;
 return `<div class="card" data-post-id="${post.post_id}">
 <span class="cbadge ${info.badge.cls}">${info.badge.text}</span>
 <div class="theme">${post.theme}</div>
 <div class="meta">${kind}：${dateLabel} ／ ${post.post_id}</div>
-<div class="slides">${post.images.map(src => `<img src="${src}" alt="" loading="lazy">`).join('')}</div>
+${slidesHtml}
 <div class="pids">${(post.product_ids || []).map(id => `<span class="badge">${id}</span>`).join('')}</div>
 <div class="fb">
 <label>フィードバック（この端末に自動保存）</label>
@@ -169,13 +184,14 @@ const scheduled = items.filter(x =>!x.info.published)
 const published = items.filter(x => x.info.published)
 .sort((a, b) => (b.info.dateObj || new Date(0)) - (a.info.dateObj || new Date(0)));
 const ordered = [...scheduled,...published];
+const ideaCount = scheduled.filter(x => x.info.isIdea).length;
 
 app.innerHTML = `
 <h1>ここにゃす管理ページ</h1>
 <div class="sub">投稿ストックの確認と画像フィードバック用（このページは公開ページからリンクされていません）</div>
 <div class="summary">
 <span class="num">投稿済み <b>${published.length}</b> 件</span>
-<span class="num">ストック（未投稿）<b>${scheduled.length}</b> 件</span>
+<span class="num">ストック（未投稿）<b>${scheduled.length}</b> 件（うち企画中 <b>${ideaCount}</b> 件）</span>
 <span style="flex:1"></span>
 <button type="button" class="copy" id="copyAll">FBをまとめてコピー</button>
 </div>

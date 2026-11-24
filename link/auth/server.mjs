@@ -564,7 +564,14 @@ const server = http.createServer(async (req, res) => {
 });
 
 import { pathToFileURL } from 'node:url';
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// git-sync の symlink 経由で起動されると argv[1] と import.meta.url (実パス解決済み) が
+// 一致しないため、realpath で揃えてから比較する
+let isMainModule = false;
+try {
+  isMainModule = !!process.argv[1] &&
+    import.meta.url === pathToFileURL(fs.realpathSync(process.argv[1])).href;
+} catch { isMainModule = false; }
+if (isMainModule) {
   if (!AUTH_SECRET) {
     console.error('AUTH_SECRET が未設定です。k8s Secret (link-auth-secret) を設定してください。起動を中止します。');
     process.exit(1);
