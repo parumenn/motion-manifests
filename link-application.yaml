@@ -1,0 +1,21 @@
+# リンクサイト専用 ArgoCD Application
+# motion-app（path=.）がこのマニフェストを適用して link-site アプリを登録する（app-of-apps）。
+# link-site は link/manifests/ 配下だけを管理する。サイト実ファイルは link/app/（git-sync が配信）。
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: link-site
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/parumenn/motion-manifests
+    targetRevision: HEAD
+    path: link/manifests
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
