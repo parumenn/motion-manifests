@@ -8,6 +8,10 @@ metadata:
   namespace: default
 data:
   default.conf: |
+    map $status $asset_cache_control {
+      200     "max-age=3600";
+      default "no-store";
+    }
     server {
       listen 80;
       server_name _;
@@ -46,7 +50,8 @@ data:
         try_files $uri $uri/ =404;
       }
       location /assets/ {
-        expires 1h;
+        add_header Cache-Control $asset_cache_control always;
+        try_files $uri =404;
       }
     }
 ---
