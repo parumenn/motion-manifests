@@ -23,7 +23,7 @@ data:
         try_files $uri =404;
       }
       location @admin_login_redirect {
-        return 302 /admin-login.html?next=$request_uri;
+        return 302 https://$host/admin-login.html?next=$request_uri;
       }
       location = /__auth/check {
         internal;
