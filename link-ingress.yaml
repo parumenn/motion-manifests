@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: link-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx-f5
+  rules:
+  - host: go.parumenn.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: link-svc
+            port:
+              number: 80
