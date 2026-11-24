@@ -16,3 +16,14 @@ spec:
             name: link-svc
             port:
               number: 80
+  # アイテム検索はこちら.parumenn.com（Punycode表記。Hostヘッダーはこの形で届く）
+  - host: xn--28j2a2bwg7em2vmhs219bu3ub.parumenn.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: link-svc
+            port:
+              number: 80
