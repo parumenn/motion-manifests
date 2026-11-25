@@ -50,7 +50,7 @@ const pwInput = document.getElementById('pw');
 const pwBtn = document.getElementById('pwBtn');
 const pkBtn = document.getElementById('pkBtn');
 const params = new URLSearchParams(location.search);
-const next = params.get('next') && params.get('next').startsWith('/') ? params.get('next') : '/admin.html';
+const next = params.get('next') && params.get('next').startsWith('/') ? params.get('next') : '/mugi/admin.html';
 
 function showMsg(text, cls) {
   msgEl.textContent = text;

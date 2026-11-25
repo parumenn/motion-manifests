@@ -293,7 +293,7 @@ async function loadPasskeys() {
 async function loadAuthInfo() {
   const { status, json } = await apiJson('/me', 'POST', {});
   if (status !== 200) {
-    authInfo.innerHTML = 'セッションが確認できません。<a href="/admin-login.html">ログイン画面へ</a>';
+    authInfo.innerHTML = 'セッションが確認できません。<a href="/mugi/admin-login.html">ログイン画面へ</a>';
     return;
   }
   authInfo.textContent = `ログイン中（方式：${json.auth_method === 'passkey' ? 'パスキー' : 'パスワード'}）`;
@@ -358,7 +358,7 @@ async function doDeletePasskey(credentialId) {
 document.getElementById('pkAdd').addEventListener('click', () => withStepUp(doRegisterPasskey));
 document.getElementById('logoutBtn').addEventListener('click', async () => {
   await apiJson('/logout', 'POST', {});
-  location.href = '/admin-login.html';
+  location.href = '/mugi/admin-login.html';
 });
 document.getElementById('stepupPwBtn').addEventListener('click', async () => {
   const pw = document.getElementById('stepupPw').value;
