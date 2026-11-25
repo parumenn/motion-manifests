@@ -1,5 +1,5 @@
 {
- "assets_version": "202511251345",
+ "assets_version": "202511251500",
  "posts": [
   {
    "post_id": "p3-hand-warmer",
@@ -240,6 +240,44 @@
    ],
    "theme": "今冬の足元あったかガジェット",
    "status": "published"
+  },
+  {
+   "post_id": "p13-ikea-desk-storage",
+   "date": "2026-12-06",
+   "theme": "IKEAで作るデスク収納",
+   "status": "scheduled",
+   "product_ids": [
+    "I01",
+    "I02",
+    "I03"
+   ],
+   "images": [
+    "assets/posts/p13-ikea-desk-storage/01_top.png",
+    "assets/posts/p13-ikea-desk-storage/02_item1.png",
+    "assets/posts/p13-ikea-desk-storage/03_item2.png",
+    "assets/posts/p13-ikea-desk-storage/04_item3.png",
+    "assets/posts/p13-ikea-desk-storage/05_mid.png",
+    "assets/posts/p13-ikea-desk-storage/06_final.png"
+   ]
+  },
+  {
+   "post_id": "p14-desk-light-focus",
+   "date": "2026-12-07",
+   "theme": "集中デスクの時間と明かり",
+   "status": "scheduled",
+   "product_ids": [
+    "L04",
+    "L05",
+    "T01"
+   ],
+   "images": [
+    "assets/posts/p14-desk-light-focus/01_top.png",
+    "assets/posts/p14-desk-light-focus/02_item1.png",
+    "assets/posts/p14-desk-light-focus/03_item2.png",
+    "assets/posts/p14-desk-light-focus/04_item3.png",
+    "assets/posts/p14-desk-light-focus/05_mid.png",
+    "assets/posts/p14-desk-light-focus/06_final.png"
+   ]
   }
  ],
  "products": [
@@ -601,6 +639,66 @@
    "affiliate_url": "https://hb.afl.rakuten.co.jp/ichiba/59f0cc01.dd84a53e.59f0cc02.a570ea51/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fichifujiec%2Fnk048%2F&link_type=text&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJ0ZXh0Iiwic2l6ZSI6IjI0MHgyNDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9",
    "image": "assets/posts/p12-home-cafe/04_item3.png",
    "post_id": "p12-home-cafe",
+   "shop": "楽天市場"
+  },
+  {
+   "id": "I01",
+   "name": "IKEA ELLOVEN モニタースタンド",
+   "price": 4640,
+   "item_url": "https://item.rakuten.co.jp/pray-liv/ike-80474783-ok/",
+   "affiliate_url": "https://hb.afl.rakuten.co.jp/ichiba/59f4fe4d.ff85fa95.59f4fe4e.67a55ca7/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fpray-liv%2Fike-80474783-ok%2F&link_type=hybrid_url&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJoeWJyaWRfdXJsIiwic2l6ZSI6IjI0MHgyNDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9",
+   "image": "assets/posts/p13-ikea-desk-storage/02_item1.png",
+   "post_id": "p13-ikea-desk-storage",
+   "shop": "楽天市場"
+  },
+  {
+   "id": "I02",
+   "name": "IKEA RÅSKOG ワゴン",
+   "price": 4560,
+   "item_url": "https://item.rakuten.co.jp/pray-liv/ike-60629719/",
+   "affiliate_url": "https://hb.afl.rakuten.co.jp/ichiba/59f4fe4d.ff85fa95.59f4fe4e.67a55ca7/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fpray-liv%2Fike-60629719%2F&link_type=hybrid_url&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJoeWJyaWRfdXJsIiwic2l6ZSI6IjI0MHgyNDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9",
+   "image": "assets/posts/p13-ikea-desk-storage/03_item2.png",
+   "post_id": "p13-ikea-desk-storage",
+   "shop": "楽天市場"
+  },
+  {
+   "id": "I03",
+   "name": "IKEA SKUBB 収納ケース",
+   "price": 1980,
+   "item_url": "https://item.rakuten.co.jp/import-ss-shop/ikea052/",
+   "affiliate_url": "https://hb.afl.rakuten.co.jp/ichiba/59f4ff63.6cee3d80.59f4ff64.ac7d8c69/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fimport-ss-shop%2Fikea052%2F&link_type=hybrid_url&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJoeWJyaWRfdXJsIiwic2l6ZSI6IjI0MHgyNDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9",
+   "image": "assets/posts/p13-ikea-desk-storage/04_item3.png",
+   "post_id": "p13-ikea-desk-storage",
+   "shop": "楽天市場"
+  },
+  {
+   "id": "L04",
+   "name": "IKEA SPETSBOJ テーブルランプ",
+   "price": 2400,
+   "item_url": "https://item.rakuten.co.jp/import-ss-shop/ikea014/",
+   "affiliate_url": "https://hb.afl.rakuten.co.jp/ichiba/59f4ff63.6cee3d80.59f4ff64.ac7d8c69/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fimport-ss-shop%2Fikea014%2F&link_type=hybrid_url&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJoeWJyaWRfdXJsIiwic2l6ZSI6IjI0MHgyNDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9",
+   "image": "assets/posts/p14-desk-light-focus/02_item1.png",
+   "post_id": "p14-desk-light-focus",
+   "shop": "楽天市場"
+  },
+  {
+   "id": "L05",
+   "name": "IKEA STRÅLA ポータブルLED",
+   "price": 3480,
+   "item_url": "https://item.rakuten.co.jp/clair-kobe/m10635218/",
+   "affiliate_url": "https://hb.afl.rakuten.co.jp/ichiba/59f500f5.18b7f0a1.59f500f6.2a8384b3/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fclair-kobe%2Fm10635218%2F&link_type=hybrid_url&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJoeWJyaWRfdXJsIiwic2l6ZSI6IjI0MHgyNDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9",
+   "image": "assets/posts/p14-desk-light-focus/03_item2.png",
+   "post_id": "p14-desk-light-focus",
+   "shop": "楽天市場"
+  },
+  {
+   "id": "T01",
+   "name": "sology MIRAI TIMER",
+   "price": 1511,
+   "item_url": "https://item.rakuten.co.jp/d-dish/lty0102ry/",
+   "affiliate_url": "https://hb.afl.rakuten.co.jp/ichiba/59f501dd.b6ed58d0.59f501de.de470ee7/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fd-dish%2Flty0102ry%2F&link_type=hybrid_url&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJoeWJyaWRfdXJsIiwic2l6ZSI6IjI0MHgyNDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9",
+   "image": "assets/posts/p14-desk-light-focus/04_item3.png",
+   "post_id": "p14-desk-light-focus",
    "shop": "楽天市場"
   }
  ],
