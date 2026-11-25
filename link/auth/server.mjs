@@ -323,7 +323,7 @@ function registrationOptions(sessionHash) {
     challenge,
     rp: { name: RP_NAME, id: RP_ID },
     user: { id: b64url(ADMIN_USER_ID), name: ADMIN_USER_NAME, displayName: RP_NAME },
-    pubKeyCredParams: [{ type: 'public-key', alg: -8 }, { type: 'public-key', alg: -7 }, { type: 'public-key', alg: -37 }],
+    pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -37 }, { type: 'public-key', alg: -8 }],
     timeout: 60000,
     attestation: 'none',
     excludeCredentials: state.passkeys.map(p => ({ id: p.credential_id, type: 'public-key' })),
@@ -521,7 +521,8 @@ const server = http.createServer(async (req, res) => {
         let cred;
         try {
           cred = verifyRegistration(response, presentedChallenge);
-        } catch {
+        } catch (e) {
+          console.log('passkey register verify failed:', e && e.message);
           return sendJson(res, 400, { error: 'verification_failed', message: 'パスキーの検証に失敗しました' });
         }
         if (state.passkeys.some(pk => pk.credential_id === cred.credential_id)) {
@@ -530,6 +531,7 @@ const server = http.createServer(async (req, res) => {
         const name = typeof body.name === 'string' && body.name.trim() ? body.name.trim().slice(0, 50) : 'パスキー';
         state.passkeys.push({ ...cred, name, created_at: nowIso(), last_used_at: null });
         saveState();
+        console.log('passkey registered:', cred.credential_id.slice(0, 8), 'total', state.passkeys.length);
         return sendJson(res, 200, { ok: true });
       }
 

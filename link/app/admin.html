@@ -334,7 +334,12 @@ async function doRegisterPasskey() {
       setMsg(pkMsg, (ver.json && ver.json.message) || 'パスキーの登録に失敗しました', true);
     }
   } catch (e) {
-    setMsg(pkMsg, 'パスキーの登録に失敗しました', true);
+    console.error('doRegisterPasskey', e);
+    if (e && e.name === 'InvalidStateError') {
+      setMsg(pkMsg, 'このブラウザ／アカウントには登録済みのパスキーがあるため追加できませんでした。登録済みのパスキーでログインできます', true);
+    } else {
+      setMsg(pkMsg, `パスキーの登録に失敗しました（${(e && e.name) || 'Error'}）`, true);
+    }
   }
 }
 async function doDeletePasskey(credentialId) {
