@@ -153,6 +153,7 @@ else badge = { text: '未投稿（日付経過）', cls: 'overdue'};
 return { published, isIdea, diff, badge, dateObj: d};
 }
 
+const ver = src => (window.ADMIN_DATA && window.ADMIN_DATA.assets_version && src && src.startsWith('assets/')) ? src + '?v=' + window.ADMIN_DATA.assets_version : src;
 const fbKey = postId => 'adminfb:' + postId;
 const fbText = post => `${post.post_id}（${post.theme}）：${(localStorage.getItem(fbKey(post.post_id)) || '').trim()}`;
 
@@ -160,7 +161,7 @@ function cardHtml(post, info) {
 const dateLabel = post.date? post.date.replace(/-/g, '/'): '未定';
 const kind = info.published? '投稿日': '投稿予定日';
 const slidesHtml = post.images && post.images.length
-? `<div class="slides">${post.images.map(src => `<img src="${src}" alt="" loading="lazy">`).join('')}</div>`
+? `<div class="slides">${post.images.map(src => `<img src="${ver(src)}" alt="" loading="lazy">`).join('')}</div>`
 : `<div class="placeholder"><span>${post.theme}</span></div>`;
 return `<div class="card" data-post-id="${post.post_id}">
 <span class="cbadge ${info.badge.cls}">${info.badge.text}</span>
@@ -233,7 +234,7 @@ showToast(await copyText(lines.join('\n'))? `${lines.length}件コピーしま�
 });
 }
 
-fetch('data.json').then(r => r.json()).then(render)
+fetch('data.json', { cache: 'no-store' }).then(r => r.json()).then(d => { window.ADMIN_DATA = d; render(d); })
 .catch(() => { app.innerHTML = '<div class="empty">data.json の読み込みに失敗しました。</div>';});
 </script>
 <script src="admin-common.js"></script>
