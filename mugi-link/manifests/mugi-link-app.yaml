@@ -11,6 +11,10 @@ data:
     server {
       listen 80;
       server_name _;
+      # 統合ホスト化（2026-11-25）: 旧サブドメインは go.parumenn.com/mugi/ へ恒久リダイレクト
+      location / {
+        return 301 https://go.parumenn.com/mugi$request_uri;
+      }
       root /git/mugilinkcurrent/mugi-link/app;
       index index.html;
       location ~ "^/r/([A-Z][0-9]{2})$" {
