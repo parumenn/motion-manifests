@@ -1,1 +1,36 @@
-{"assets_version":"202511251700","posts":[],"products":[],"profile":{"bio":"主婦目線で見つけた、暮らしがちょっとラクになる・気分が上がるアイテムを紹介します。キッチン・掃除・収納など、毎日の家事に役立つものを中心にまとめています。気になる商品は上の検索から探してね。","icon":"assets/icon-256.jpg","id":"mugi.outi","name":"むぎ"}}
+{
+ "assets_version": "202511251700",
+ "posts": [
+  {
+   "post_id": "p-test",
+   "date": "2026-11-25",
+   "theme": "テスト投稿（確認用・削除予定）",
+   "images": [
+    "assets/icon-256.jpg"
+   ],
+   "product_ids": [
+    "T01"
+   ],
+   "instagram_url": "",
+   "status": "published"
+  }
+ ],
+ "products": [
+  {
+   "id": "T01",
+   "name": "テスト商品",
+   "price": 100,
+   "shop": "楽天市場",
+   "item_url": "https://example.com/item",
+   "affiliate_url": "https://example.com/aff",
+   "image": "assets/icon-256.jpg",
+   "post_id": "p-test"
+  }
+ ],
+ "profile": {
+  "bio": "主婦目線で見つけた、暮らしがちょっとラクになる・気分が上がるアイテムを紹介します。キッチン・掃除・収納など、毎日の家事に役立つものを中心にまとめています。気になる商品は上の検索から探してね。",
+  "icon": "assets/icon-256.jpg",
+  "id": "mugi.outi",
+  "name": "むぎ"
+ }
+}
