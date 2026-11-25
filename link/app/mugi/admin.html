@@ -237,7 +237,7 @@ showToast(await copyText(lines.join('\n'))? `${lines.length}件コピーしま�
 fetch('data.json', { cache: 'no-store' }).then(r => r.json()).then(d => { window.ADMIN_DATA = d; render(d); })
 .catch(() => { app.innerHTML = '<div class="empty">data.json の読み込みに失敗しました。</div>';});
 </script>
-<script src="admin-common.js"></script>
+<script src="admin-common.js?v=20261126-authsep"></script>
 <script>
 // ---- 管理者メニュー（認証・パスキー管理） ----
 const authInfo = document.getElementById('authInfo');
