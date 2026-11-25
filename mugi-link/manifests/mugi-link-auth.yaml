@@ -1,0 +1,112 @@
+# むぎ リンクサイト管理ページ用 認証バックエンド (mugi-link-auth)
+# コードは motion-manifests の mugi-link/auth/ に置き、git-sync で配信する (サイト本体と同じ方式)。
+# 秘密 (AUTH_SECRET / LINK_ADMIN_PASSWORD_HASH) は Git に入れず、k8s Secret
+# mugi-link-auth-secret から envFrom で注入する (Secret 自体は GitOps 対象外で別途作成)。
+# 状態 (パスキー/セッション) は hostPath PV 上の state.json に永続化する。
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mugi-link-auth-data-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /home/parumenn-admin/mugi-link-auth-data
+    type: Directory
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mugi-link-auth-data
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: mugi-link-auth-data-pv
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mugi-link-auth
+  namespace: default
+  labels:
+    app: mugi-link-auth
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: mugi-link-auth
+  template:
+    metadata:
+      labels:
+        app: mugi-link-auth
+    spec:
+      containers:
+      - name: git-sync
+        image: registry.k8s.io/git-sync/git-sync:v4.2.4
+        args:
+        - --repo=https://github.com/parumenn/motion-manifests
+        - --ref=main
+        - --root=/git
+        - --link=mugilinkcurrent
+        - --period=120s
+        - --max-failures=30
+        volumeMounts:
+        - name: content
+          mountPath: /git
+      - name: auth
+        image: node:20-alpine
+        command:
+        - sh
+        - -c
+        - while [ ! -f /git/mugilinkcurrent/mugi-link/auth/server.mjs ]; do sleep 2; done; exec node /git/mugilinkcurrent/mugi-link/auth/server.mjs
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        - name: DATA_DIR
+          value: /data
+        - name: RP_ID
+          value: parumenn.com
+        - name: RP_NAME
+          value: むぎ管理ページ
+        - name: ALLOWED_ORIGINS
+          value: "https://xn--28j2a2bwg7em2vmho553b4p3b.parumenn.com"
+        envFrom:
+        - secretRef:
+            name: mugi-link-auth-secret
+        volumeMounts:
+        - name: content
+          mountPath: /git
+          readOnly: true
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: content
+        emptyDir: {}
+      - name: data
+        persistentVolumeClaim:
+          claimName: mugi-link-auth-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mugi-link-auth-svc
+  namespace: default
+spec:
+  selector:
+    app: mugi-link-auth
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+  type: ClusterIP

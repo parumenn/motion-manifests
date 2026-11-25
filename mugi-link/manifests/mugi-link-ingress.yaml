@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mugi-link-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx-f5
+  rules:
+  # 投稿アイテムはこちら.parumenn.com（Punycode表記。Hostヘッダーはこの形で届く）
+  - host: xn--28j2a2bwg7em2vmho553b4p3b.parumenn.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mugi-link-svc
+            port:
+              number: 80

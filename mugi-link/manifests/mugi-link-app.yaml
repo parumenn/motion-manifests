@@ -1,0 +1,114 @@
+# むぎ リンクサイト（投稿アイテムはこちら.parumenn.com）
+# サイト実ファイルは motion-manifests リポジトリの mugi-link/app/ に置き、
+# git-sync サイドカーが定期取得して nginx が配信する。
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mugi-link-nginx-conf
+  namespace: default
+data:
+  default.conf: |
+    server {
+      listen 80;
+      server_name _;
+      root /git/mugilinkcurrent/mugi-link/app;
+      index index.html;
+      location ~ "^/r/([A-Z][0-9]{2})$" {
+        return 302 /#r/$1;
+      }
+      # 管理ページは認証必須 (mugi-link-auth の /check に auth_request)
+      location = /admin.html {
+        auth_request /__auth/check;
+        error_page 401 = @admin_login_redirect;
+        try_files $uri =404;
+      }
+      location @admin_login_redirect {
+        return 302 https://$host/admin-login.html?next=$request_uri;
+      }
+      location = /__auth/check {
+        internal;
+        proxy_pass http://mugi-link-auth-svc.default.svc.cluster.local:8080/check;
+        proxy_http_version 1.1;
+        proxy_pass_request_body off;
+        proxy_set_header Content-Length "";
+        proxy_set_header Cookie $http_cookie;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      }
+      # 認証API (パスワード/パスキー) は mugi-link-auth バックエンドへ
+      location /auth-api/ {
+        proxy_pass http://mugi-link-auth-svc.default.svc.cluster.local:8080/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+      }
+      location / {
+        try_files $uri $uri/ =404;
+      }
+      location /assets/ {
+        expires 1h;
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mugi-link-app
+  namespace: default
+  labels:
+    app: mugi-link-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mugi-link-app
+  template:
+    metadata:
+      labels:
+        app: mugi-link-app
+    spec:
+      containers:
+      - name: git-sync
+        image: registry.k8s.io/git-sync/git-sync:v4.2.4
+        args:
+        - --repo=https://github.com/parumenn/motion-manifests
+        - --ref=main
+        - --root=/git
+        - --link=mugilinkcurrent
+        - --period=120s
+        - --max-failures=30
+        volumeMounts:
+        - name: content
+          mountPath: /git
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: content
+          mountPath: /git
+          readOnly: true
+        - name: conf
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
+          readOnly: true
+      volumes:
+      - name: content
+        emptyDir: {}
+      - name: conf
+        configMap:
+          name: mugi-link-nginx-conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mugi-link-svc
+  namespace: default
+spec:
+  selector:
+    app: mugi-link-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: ClusterIP
