@@ -1,0 +1,112 @@
+# ねむ リンクサイト管理ページ用 認証バックエンド (nemu-link-auth)
+# コードは motion-manifests の nemu-link/auth/ に置き、git-sync で配信する (サイト本体と同じ方式)。
+# 秘密 (AUTH_SECRET / LINK_ADMIN_PASSWORD_HASH) は Git に入れず、k8s Secret
+# nemu-link-auth-secret から envFrom で注入する (Secret 自体は GitOps 対象外で別途作成)。
+# 状態 (パスキー/セッション) は hostPath PV 上の state.json に永続化する。
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nemu-link-auth-data-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /home/parumenn-admin/nemu-link-auth-data
+    type: Directory
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nemu-link-auth-data
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: nemu-link-auth-data-pv
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nemu-link-auth
+  namespace: default
+  labels:
+    app: nemu-link-auth
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: nemu-link-auth
+  template:
+    metadata:
+      labels:
+        app: nemu-link-auth
+    spec:
+      containers:
+      - name: git-sync
+        image: registry.k8s.io/git-sync/git-sync:v4.2.4
+        args:
+        - --repo=https://github.com/parumenn/motion-manifests
+        - --ref=main
+        - --root=/git
+        - --link=nemulinkcurrent
+        - --period=120s
+        - --max-failures=30
+        volumeMounts:
+        - name: content
+          mountPath: /git
+      - name: auth
+        image: node:20-alpine
+        command:
+        - sh
+        - -c
+        - while [ ! -f /git/nemulinkcurrent/nemu-link/auth/server.mjs ]; do sleep 2; done; exec node /git/nemulinkcurrent/nemu-link/auth/server.mjs
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        - name: DATA_DIR
+          value: /data
+        - name: RP_ID
+          value: parumenn.com
+        - name: RP_NAME
+          value: ねむ管理ページ
+        - name: ALLOWED_ORIGINS
+          value: "https://go.parumenn.com"
+        envFrom:
+        - secretRef:
+            name: nemu-link-auth-secret
+        volumeMounts:
+        - name: content
+          mountPath: /git
+          readOnly: true
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: content
+        emptyDir: {}
+      - name: data
+        persistentVolumeClaim:
+          claimName: nemu-link-auth-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nemu-link-auth-svc
+  namespace: default
+spec:
+  selector:
+    app: nemu-link-auth
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+  type: ClusterIP
