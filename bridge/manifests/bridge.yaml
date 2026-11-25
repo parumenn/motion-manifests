@@ -1,6 +1,63 @@
 # agent-bridge 公開用マニフェスト
-# 実体: parumenn-server ホスト上の systemd サービス agent-bridge (port 8737)
-# Endpoints でホストIPへ直接向け、F5 Ingress で bridge.parumenn.com を受ける
+# 実体: parumenn-server ホスト上の systemd サービス agent-bridge (192.168.0.64:8737)
+# Endpoints 直結は ArgoCD に取り込まれなかったため、link サイトと同方式の
+# クラスタ内 nginx プロキシ (Deployment) を挟んで Service 化し、F5 Ingress で受ける
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-bridge-nginx-conf
+  namespace: default
+data:
+  default.conf: |
+    server {
+      listen 80;
+      server_name _;
+      location / {
+        proxy_pass http://192.168.0.64:8737;
+        proxy_http_version 1.1;
+        proxy_set_header Host ;
+        proxy_set_header Authorization ;
+        proxy_set_header Content-Type ;
+        proxy_set_header X-Forwarded-For ;
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-bridge-proxy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agent-bridge-proxy
+  template:
+    metadata:
+      labels:
+        app: agent-bridge-proxy
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+            requests:
+              memory: "32Mi"
+              cpu: "25m"
+          volumeMounts:
+            - name: conf
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+      volumes:
+        - name: conf
+          configMap:
+            name: agent-bridge-nginx-conf
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -8,22 +65,12 @@ metadata:
   namespace: default
 spec:
   type: ClusterIP
+  selector:
+    app: agent-bridge-proxy
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 8737
----
-apiVersion: v1
-kind: Endpoints
-metadata:
-  name: agent-bridge-svc
-  namespace: default
-subsets:
-  - addresses:
-      - ip: 192.168.0.64
-    ports:
-      - port: 8737
-        protocol: TCP
+      targetPort: 80
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
