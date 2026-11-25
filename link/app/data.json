@@ -1,5 +1,5 @@
 {
- "assets_version": "202511251500",
+ "assets_version": "202511251740",
  "posts": [
   {
    "post_id": "p3-hand-warmer",
@@ -314,6 +314,7 @@
   {
    "affiliate_url": "https://hb.afl.rakuten.co.jp/ichiba/59f093bb.d9d6a12b.59f093bc.3651d15c/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fcocodecow%2Fr517md%2F&link_type=text&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJ0ZXh0Iiwic2l6ZSI6IjI0MHgyNDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9",
    "id": "W01",
+   "amazon_url": "https://www.amazon.co.jp/dp/B0FM7BXSVZ?tag=coconyas-22",
    "image": "assets/posts/p1-foot-warmer/02_item1.png",
    "item_url": "https://item.rakuten.co.jp/cocodecow/r517md/",
    "name": "アイリスオーヤマ ぐるポカ APH-R12B",
@@ -443,6 +444,7 @@
   },
   {
    "id": "C02",
+   "amazon_url": "https://www.amazon.co.jp/dp/B0GSXLB84V?tag=coconyas-22",
    "name": "サンワ ケーブルボックス",
    "price": 2480,
    "item_url": "https://item.rakuten.co.jp/sanwadirect/200-cb100/",
@@ -553,6 +555,7 @@
   },
   {
    "id": "A01",
+   "amazon_url": "https://www.amazon.co.jp/dp/B0FRSN8MK5?tag=coconyas-22",
    "name": "Redmi Buds 8 lite",
    "price": 3680,
    "item_url": "https://item.rakuten.co.jp/xiaomiofficial/m71620/",
@@ -573,6 +576,7 @@
   },
   {
    "id": "A03",
+   "amazon_url": "https://www.amazon.co.jp/dp/B0C3Q65R9P?tag=coconyas-22",
    "name": "ソニー SRS-XB100 スピーカー",
    "price": 7180,
    "item_url": "https://item.rakuten.co.jp/kaden-supply/srs-xb100/",
