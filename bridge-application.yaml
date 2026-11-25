@@ -1,0 +1,22 @@
+# エージェント間ブリッジ専用 ArgoCD Application
+# motion-app（path=.）がこのマニフェストを適用して agent-bridge アプリを登録する（app-of-apps）。
+# agent-bridge は bridge/manifests/ 配下だけを管理する。実体はホスト上の systemd サービス
+# （agent-bridge.service, 192.168.0.64:8737）で、Service/Endpoints 経由で公開する。
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: agent-bridge
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/parumenn/motion-manifests
+    targetRevision: HEAD
+    path: bridge/manifests
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
