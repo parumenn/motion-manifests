@@ -154,7 +154,7 @@ return { published, isIdea, diff, badge, dateObj: d};
 }
 
 const ver = src => (window.ADMIN_DATA && window.ADMIN_DATA.assets_version && src && src.startsWith('assets/')) ? src + '?v=' + window.ADMIN_DATA.assets_version : src;
-const fbKey = postId => 'adminfb:' + postId;
+const fbKey = postId => 'adminfb:mugi:' + postId;
 const fbText = post => `${post.post_id}（${post.theme}）：${(localStorage.getItem(fbKey(post.post_id)) || '').trim()}`;
 
 function cardHtml(post, info) {

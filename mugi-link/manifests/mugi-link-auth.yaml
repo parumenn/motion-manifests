@@ -80,7 +80,7 @@ spec:
         - name: RP_NAME
           value: むぎ管理ページ
         - name: ALLOWED_ORIGINS
-          value: "https://xn--28j2a2bwg7em2vmho553b4p3b.parumenn.com"
+          value: "https://go.parumenn.com,https://xn--28j2a2bwg7em2vmho553b4p3b.parumenn.com"
         envFrom:
         - secretRef:
             name: mugi-link-auth-secret

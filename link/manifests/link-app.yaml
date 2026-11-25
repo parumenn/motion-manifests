@@ -25,9 +25,29 @@ data:
         return 302 /mugi/#r/$1;
       }
       location = /mugi/admin.html {
-        auth_request /__auth/check;
-        error_page 401 = @admin_login_redirect;
+        auth_request /__auth_mugi/check;
+        error_page 401 = @mugi_admin_login_redirect;
         try_files $uri =404;
+      }
+      location @mugi_admin_login_redirect {
+        return 302 https://$host/mugi/admin-login.html?next=$request_uri;
+      }
+      location = /__auth_mugi/check {
+        internal;
+        proxy_pass http://mugi-link-auth-svc.default.svc.cluster.local:8080/check;
+        proxy_http_version 1.1;
+        proxy_pass_request_body off;
+        proxy_set_header Content-Length "";
+        proxy_set_header Cookie $http_cookie;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      }
+      # Mugi admin auth API goes to the mugi-link-auth backend (per-account separation)
+      location /mugi/auth-api/ {
+        proxy_pass http://mugi-link-auth-svc.default.svc.cluster.local:8080/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
       }
       # 管理ページは認証必須 (link-auth の /check に auth_request)
       location = /admin.html {

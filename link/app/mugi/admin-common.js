@@ -41,7 +41,7 @@ function serializeCredential(cred) {
   return out;
 }
 async function apiJson(path, method = 'GET', body) {
-  const res = await fetch('/auth-api' + path, {
+  const res = await fetch('/mugi/auth-api' + path, {
     method,
     headers: body ? { 'Content-Type': 'application/json' } : {},
     body: body ? JSON.stringify(body) : undefined,
