@@ -20,6 +20,15 @@ data:
       location ~ "^/r/([A-Z][0-9]{2})$" {
         return 302 /#r/$1;
       }
+      # むぎ（統合テナント /mugi/）の短縮リンクと管理ページ認証
+      location ~ "^/mugi/r/([A-Z][0-9]{2})$" {
+        return 302 /mugi/#r/$1;
+      }
+      location = /mugi/admin.html {
+        auth_request /__auth/check;
+        error_page 401 = @admin_login_redirect;
+        try_files $uri =404;
+      }
       # 管理ページは認証必須 (link-auth の /check に auth_request)
       location = /admin.html {
         auth_request /__auth/check;

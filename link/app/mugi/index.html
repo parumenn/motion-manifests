@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>むぎ｜アイテム検索はこちら</title>
+<style>
+  :root { --brown:#5B4636; --sage:#7A8F6E; --line:#e5ded6; --bg:#fffdf9; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif; background:var(--bg); color:var(--brown); }
+  .wrap { max-width:480px; margin:0 auto; padding:20px 14px 48px; }
+  header.profile { display:flex; gap:16px; align-items:center; }
+  header.profile img { width:76px; height:76px; border-radius:50%; object-fit:cover; border:2px solid var(--sage); }
+  .pid { font-weight:700; font-size:18px; }
+  .pname { font-size:14px; margin-top:2px; }
+  .pbio { font-size:13px; line-height:1.5; margin-top:10px; white-space:pre-line; }
+  .search { margin:22px 0 6px; }
+  .search input { width:100%; padding:14px 16px; font-size:17px; border:2px solid var(--sage); border-radius:999px; outline:none; background:#fff; color:var(--brown); }
+  .field { position:relative; }
+  .field input { padding-left:18px; transition:border-color .18s ease, box-shadow .18s ease; }
+  .field input:focus { box-shadow:0 0 0 3px rgba(122,143,110,.18); }
+  .field label { position:absolute; left:12px; top:50%; transform:translateY(-50%); padding:0 6px; font-size:15px; color:#9a8a7a; pointer-events:none; white-space:nowrap; transition:top .18s ease, transform .18s ease, color .18s ease; }
+  .field input:focus + label, .field input:not(:placeholder-shown) + label { top:0; transform:translateY(-50%) scale(.8); transform-origin:left center; font-weight:700; color:var(--sage); background:var(--bg); }
+  .search .hint { font-size:12px; opacity:.75; margin:8px 4px 0; }
+  .results { margin-top:10px; display:flex; flex-direction:column; gap:10px; }
+  .product { display:flex; gap:12px; align-items:center; background:#fff; border:1px solid var(--line); border-radius:14px; padding:10px; }
+  .product img { width:64px; height:80px; object-fit:cover; border-radius:8px; }
+  .product .info { flex:1; min-width:0; }
+  .badge { display:inline-block; background:var(--brown); color:#fff; font-weight:700; font-size:13px; padding:2px 10px; border-radius:999px; letter-spacing:.08em; }
+  .product .name { font-size:14px; font-weight:700; margin-top:4px; }
+  .product .price { font-size:13px; margin-top:2px; }
+  .buy { display:inline-block; background:var(--sage); color:#fff; font-weight:700; font-size:14px; text-decoration:none; padding:10px 14px; border-radius:999px; white-space:nowrap; }
+  h2.section { font-size:15px; margin:26px 2px 10px; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:3px; }
+  .grid a { display:block; aspect-ratio:4/5; overflow:hidden; border-radius:6px; }
+  .grid img { width:100%; height:100%; object-fit:cover; display:block; }
+  .slides { display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; }
+  .deckwrap { margin-top:4px; }
+  .deck { position:relative; aspect-ratio:4/5; perspective:900px; touch-action:pan-y; user-select:none; -webkit-user-select:none; margin-top:26px; }
+  .dcard { position:absolute; inset:0; border-radius:14px; overflow:hidden; background:#fff; box-shadow:0 10px 28px rgba(91,70,54,.18); transition:transform .45s cubic-bezier(.22,.9,.3,1), opacity .45s ease; will-change:transform; }
+  .dcard img { width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
+  .deckmeta { display:flex; justify-content:space-between; align-items:center; margin:10px 4px 0; font-size:12px; opacity:.8; }
+  .slides img { width:78%; max-width:330px; border-radius:12px; flex:none; }
+  .back { display:inline-block; margin:4px 0 14px; color:var(--sage); font-weight:700; text-decoration:none; font-size:14px; }
+  .theme { font-size:17px; font-weight:700; margin-bottom:10px; }
+  .empty { font-size:13px; opacity:.7; padding:8px 4px; }
+  footer { margin-top:36px; font-size:11px; opacity:.6; text-align:center; line-height:1.6; }
+</style>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body>
+<div class="wrap" id="app">読み込み中…</div>
+<script>
+const app = document.getElementById('app');
+let DATA = null;
+const ver = src => (DATA && DATA.assets_version && src && src.startsWith('assets/')) ? src + '?v=' + DATA.assets_version : src;
+
+const yen = n => '¥' + n.toLocaleString('ja-JP');
+const buyUrl = p => p.affiliate_url || p.item_url;
+const productById = id => DATA.products.find(p => p.id === id);
+const postById = id => DATA.posts.find(p => p.post_id === id);
+
+function productRow(p) {
+  return `<div class="product">
+    <img src="${ver(p.image)}" alt="">
+    <div class="info">
+      <span class="badge">${p.id}</span>
+      <div class="name">${p.name}</div>
+      <div class="price">${yen(p.price)}（${p.shop}）</div>
+    </div>
+    <a class="buy" href="${buyUrl(p)}" target="_blank" rel="noopener sponsored">楽天で見る</a>
+  </div>`;
+}
+
+function homeView() {
+  const prof = DATA.profile;
+  app.innerHTML = `
+    <header class="profile">
+      <img src="${ver(prof.icon)}" alt="">
+      <div><div class="pid">@${prof.id}</div><div class="pname">${prof.name}</div></div>
+    </header>
+    <div class="pbio">${prof.bio}</div>
+    <div class="search">
+      <div style="font-weight:700;font-size:16px;margin-bottom:12px;">アイテム検索はこちら</div>
+      <div class="field">
+        <input id="q" type="text" inputmode="search" placeholder=" " autocomplete="off">
+        <label for="q">商品ID・商品名で検索（例：D01）</label>
+      </div>
+      <div class="hint">投稿の画像に大きく書いてあるIDを入れてね。商品名でも探せます。</div>
+    </div>
+    <div class="results" id="results"></div>
+    <h2 class="section">投稿一覧</h2>
+    <div class="grid">
+      ${DATA.posts.filter(p => p.status !== 'scheduled' && p.status !== 'idea').map(p => `<a href="#post/${p.post_id}"><img src="${ver(p.images[0])}" alt="${p.theme}"></a>`).join('')}
+    </div>
+    <footer>リンク先は楽天市場などの販売ページです。<br>価格は投稿時点のものです。最新価格はリンク先でご確認ください。</footer>`;
+  const q = document.getElementById('q');
+  const results = document.getElementById('results');
+  q.addEventListener('input', () => {
+    const v = q.value.trim().toUpperCase();
+    if (!v) { results.innerHTML = ''; return; }
+    const hits = DATA.products.filter(p => p.id.startsWith(v) || p.name.toUpperCase().includes(v));
+    results.innerHTML = hits.length ? hits.map(productRow).join('') : '<div class="empty">見つかりませんでした。IDを確認してみてね。</div>';
+  });
+  q.focus();
+}
+
+function postView(postId) {
+  const post = postById(postId);
+  if (!post || post.status === 'scheduled' || post.status === 'idea') { homeView(); return; }
+  app.innerHTML = `
+    <a class="back" href="#">← もどる</a>
+    <div class="theme">${post.theme}</div>
+    <div class="deckwrap">
+      <div class="deck" id="deck">${post.images.map(src => `<div class="dcard"><img src="${ver(src)}" alt=""></div>`).join('')}</div>
+      <div class="deckmeta"><span id="deckcount">1 / ${post.images.length}</span><span>タップ／スワイプで次の画像</span></div>
+    </div>
+    <h2 class="section">この投稿の商品</h2>
+    <div class="results">${post.product_ids.map(id => productRow(productById(id))).join('')}</div>`;
+  window.scrollTo(0, 0);
+  initDeck(post.images.length);
+}
+
+function initDeck(n) {
+  const deck = document.getElementById('deck');
+  if (!deck || n < 1) return;
+  const cards = [...deck.children];
+  let order = cards.map((_, i) => i);
+  let busy = false;
+  let auto = null;
+  function layout() {
+    order.forEach((ci, depth) => {
+      const el = cards[ci];
+      el.style.zIndex = String(n - depth);
+      const d = Math.min(depth, 2);
+      el.style.opacity = depth > 2 ? '0' : '1';
+      el.style.transform = `translateY(${-12 * d}px) scale(${1 - 0.035 * d})`;
+    });
+    const c = document.getElementById('deckcount');
+    if (c) c.textContent = `${order[0] + 1} / ${n}`;
+  }
+  function swap(dir = 1) {
+    if (busy || n < 2) return;
+    busy = true;
+    const front = cards[order[0]];
+    front.style.transform = `translateX(${dir * 130}%) rotate(${dir * 10}deg)`;
+    front.style.opacity = '0';
+    setTimeout(() => {
+      order.push(order.shift());
+      layout();
+      setTimeout(() => { busy = false; }, 60);
+    }, 380);
+  }
+  function startAuto() { stopAuto(); auto = setInterval(() => swap(1), 4000); }
+  function stopAuto() { if (auto) { clearInterval(auto); auto = null; } }
+  window._deckCleanup = stopAuto;
+  layout();
+  startAuto();
+  let sx = null, dx = 0, resumeTimer = null;
+  deck.addEventListener('pointerdown', e => { sx = e.clientX; dx = 0; stopAuto(); if (resumeTimer) clearTimeout(resumeTimer); });
+  deck.addEventListener('pointermove', e => {
+    if (sx === null || busy) return;
+    dx = e.clientX - sx;
+    const front = cards[order[0]];
+    front.style.transition = 'none';
+    front.style.transform = `translateX(${dx}px) rotate(${dx / 18}deg)`;
+  });
+  function endDrag() {
+    if (sx === null) return;
+    const front = cards[order[0]];
+    front.style.transition = '';
+    if (Math.abs(dx) > 55) swap(dx > 0 ? 1 : -1);
+    else if (Math.abs(dx) < 6) swap(1);
+    else layout();
+    sx = null; dx = 0;
+    resumeTimer = setTimeout(startAuto, 6000);
+  }
+  deck.addEventListener('pointerup', endDrag);
+  deck.addEventListener('pointercancel', endDrag);
+}
+
+function route() {
+  if (window._deckCleanup) { window._deckCleanup(); window._deckCleanup = null; }
+  const h = location.hash;
+  const mPost = h.match(/^#post\/(.+)$/);
+  const mR = h.match(/^#r\/([A-Za-z][0-9]{2})$/);
+  if (mR) {
+    const p = productById(mR[1].toUpperCase());
+    if (p) { location.replace(buyUrl(p)); return; }
+  }
+  if (mPost) postView(mPost[1]); else homeView();
+}
+
+fetch('data.json', { cache: 'no-store' }).then(r => r.json()).then(d => { DATA = d; route(); });
+window.addEventListener('hashchange', route);
+</script>
+</body>
+</html>
