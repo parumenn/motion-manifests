@@ -71,7 +71,7 @@ function productRow(p) {
     <div class="info">
       <span class="badge">${p.id}</span>
       <div class="name">${p.name}</div>
-      <div class="price">${yen(p.price)}（${p.shop}）</div>
+      <div class="price">${yen(p.price)}${p.shop ? `（${p.shop}）` : }</div>
     </div>
     <div class="buys">
       <a class="buy" href="${buyUrl(p)}" target="_blank" rel="noopener sponsored">楽天で見る</a>
