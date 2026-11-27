@@ -136,6 +136,35 @@ data:
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
       }
+      # ここにゃす（統合テナント /kokonyasu/）の短縮リンクと管理ページ認証
+      location ~ "^/kokonyasu/r/([A-Z][0-9]{2})$" {
+        return 302 /kokonyasu/#r/$1;
+      }
+      location = /kokonyasu/admin.html {
+        auth_request /__auth_kokonyasu/check;
+        error_page 401 = @kokonyasu_admin_login_redirect;
+        try_files $uri =404;
+      }
+      location @kokonyasu_admin_login_redirect {
+        return 302 https://$host/kokonyasu/admin-login.html?next=$request_uri;
+      }
+      location = /__auth_kokonyasu/check {
+        internal;
+        proxy_pass http://kokonyasu-link-auth-svc.default.svc.cluster.local:8080/check;
+        proxy_http_version 1.1;
+        proxy_pass_request_body off;
+        proxy_set_header Content-Length "";
+        proxy_set_header Cookie $http_cookie;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      }
+      # ここにゃす admin auth API goes to the kokonyasu-link-auth backend (per-account separation)
+      location /kokonyasu/auth-api/ {
+        proxy_pass http://kokonyasu-link-auth-svc.default.svc.cluster.local:8080/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+      }
       # 管理ページは認証必須 (link-auth の /check に auth_request)
       location = /admin.html {
         auth_request /__auth/check;
