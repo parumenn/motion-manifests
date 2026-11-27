@@ -1,0 +1,21 @@
+# つく リンクサイト専用 ArgoCD Application
+# motion-app（path=.）がこのマニフェストを適用して tsuku-link-site アプリを登録する（app-of-apps）。
+# tsuku-link-site は tsuku-link/manifests/ 配下だけを管理する。認証バックエンドのみ。サイト実ファイルは link/app/tsuku/（link-app の git-sync が配信）。
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tsuku-link-site
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/parumenn/motion-manifests
+    targetRevision: HEAD
+    path: tsuku-link/manifests
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

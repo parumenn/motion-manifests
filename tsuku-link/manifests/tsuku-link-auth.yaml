@@ -1,0 +1,112 @@
+# つく リンクサイト管理ページ用 認証バックエンド (tsuku-link-auth)
+# コードは motion-manifests の tsuku-link/auth/ に置き、git-sync で配信する (サイト本体と同じ方式)。
+# 秘密 (AUTH_SECRET / LINK_ADMIN_PASSWORD_HASH) は Git に入れず、k8s Secret
+# tsuku-link-auth-secret から envFrom で注入する (Secret 自体は GitOps 対象外で別途作成)。
+# 状態 (パスキー/セッション) は hostPath PV 上の state.json に永続化する。
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: tsuku-link-auth-data-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /home/parumenn-admin/tsuku-link-auth-data
+    type: Directory
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tsuku-link-auth-data
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: tsuku-link-auth-data-pv
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tsuku-link-auth
+  namespace: default
+  labels:
+    app: tsuku-link-auth
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: tsuku-link-auth
+  template:
+    metadata:
+      labels:
+        app: tsuku-link-auth
+    spec:
+      containers:
+      - name: git-sync
+        image: registry.k8s.io/git-sync/git-sync:v4.2.4
+        args:
+        - --repo=https://github.com/parumenn/motion-manifests
+        - --ref=main
+        - --root=/git
+        - --link=tsukulinkcurrent
+        - --period=120s
+        - --max-failures=30
+        volumeMounts:
+        - name: content
+          mountPath: /git
+      - name: auth
+        image: node:20-alpine
+        command:
+        - sh
+        - -c
+        - while [ ! -f /git/tsukulinkcurrent/tsuku-link/auth/server.mjs ]; do sleep 2; done; exec node /git/tsukulinkcurrent/tsuku-link/auth/server.mjs
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        - name: DATA_DIR
+          value: /data
+        - name: RP_ID
+          value: parumenn.com
+        - name: RP_NAME
+          value: つく管理ページ
+        - name: ALLOWED_ORIGINS
+          value: "https://go.parumenn.com"
+        envFrom:
+        - secretRef:
+            name: tsuku-link-auth-secret
+        volumeMounts:
+        - name: content
+          mountPath: /git
+          readOnly: true
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: content
+        emptyDir: {}
+      - name: data
+        persistentVolumeClaim:
+          claimName: tsuku-link-auth-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tsuku-link-auth-svc
+  namespace: default
+spec:
+  selector:
+    app: tsuku-link-auth
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+  type: ClusterIP
