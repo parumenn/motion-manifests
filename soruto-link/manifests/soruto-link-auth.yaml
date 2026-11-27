@@ -1,0 +1,112 @@
+# そると リンクサイト管理ページ用 認証バックエンド (soruto-link-auth)
+# コードは motion-manifests の soruto-link/auth/ に置き、git-sync で配信する (サイト本体と同じ方式)。
+# 秘密 (AUTH_SECRET / LINK_ADMIN_PASSWORD_HASH) は Git に入れず、k8s Secret
+# soruto-link-auth-secret から envFrom で注入する (Secret 自体は GitOps 対象外で別途作成)。
+# 状態 (パスキー/セッション) は hostPath PV 上の state.json に永続化する。
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: soruto-link-auth-data-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /home/parumenn-admin/soruto-link-auth-data
+    type: Directory
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: soruto-link-auth-data
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: soruto-link-auth-data-pv
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: soruto-link-auth
+  namespace: default
+  labels:
+    app: soruto-link-auth
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: soruto-link-auth
+  template:
+    metadata:
+      labels:
+        app: soruto-link-auth
+    spec:
+      containers:
+      - name: git-sync
+        image: registry.k8s.io/git-sync/git-sync:v4.2.4
+        args:
+        - --repo=https://github.com/parumenn/motion-manifests
+        - --ref=main
+        - --root=/git
+        - --link=sorutolinkcurrent
+        - --period=120s
+        - --max-failures=30
+        volumeMounts:
+        - name: content
+          mountPath: /git
+      - name: auth
+        image: node:20-alpine
+        command:
+        - sh
+        - -c
+        - while [ ! -f /git/sorutolinkcurrent/soruto-link/auth/server.mjs ]; do sleep 2; done; exec node /git/sorutolinkcurrent/soruto-link/auth/server.mjs
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        - name: DATA_DIR
+          value: /data
+        - name: RP_ID
+          value: parumenn.com
+        - name: RP_NAME
+          value: そると管理ページ
+        - name: ALLOWED_ORIGINS
+          value: "https://go.parumenn.com"
+        envFrom:
+        - secretRef:
+            name: soruto-link-auth-secret
+        volumeMounts:
+        - name: content
+          mountPath: /git
+          readOnly: true
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: content
+        emptyDir: {}
+      - name: data
+        persistentVolumeClaim:
+          claimName: soruto-link-auth-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: soruto-link-auth-svc
+  namespace: default
+spec:
+  selector:
+    app: soruto-link-auth
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+  type: ClusterIP

@@ -1,0 +1,21 @@
+# そると リンクサイト専用 ArgoCD Application
+# motion-app（path=.）がこのマニフェストを適用して soruto-link-site アプリを登録する（app-of-apps）。
+# soruto-link-site は soruto-link/manifests/ 配下だけを管理する。認証バックエンドのみ。サイト実ファイルは link/app/soruto/（link-app の git-sync が配信）。
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: soruto-link-site
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/parumenn/motion-manifests
+    targetRevision: HEAD
+    path: soruto-link/manifests
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
