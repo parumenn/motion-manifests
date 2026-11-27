@@ -11,6 +11,9 @@
   .wrap { max-width:480px; margin:0 auto; padding:20px 14px 48px; }
   header.profile { display:flex; gap:16px; align-items:center; }
   header.profile img { width:76px; height:76px; border-radius:50%; object-fit:cover; border:2px solid var(--sage); }
+  .home-bar { margin-bottom:14px; }
+  .home-bar img { height:26px; width:auto; display:block; }
+  header.profile a { display:flex; flex:none; }
   .pid { font-weight:700; font-size:18px; }
   .pname { font-size:14px; margin-top:2px; }
   .pbio { font-size:13px; line-height:1.5; margin-top:10px; white-space:pre-line; }
@@ -77,8 +80,9 @@ function productRow(p) {
 function homeView() {
   const prof = DATA.profile;
   app.innerHTML = `
+    <div class="home-bar"><a href="/"><img src="/logo.webp?v=1" alt="テーマ on アイテム"></a></div>
     <header class="profile">
-      <img src="${ver(prof.icon)}" alt="">
+      <a href="/"><img src="${ver(prof.icon)}" alt=""></a>
       <div><div class="pid">@${prof.id}</div><div class="pname">${prof.name}</div></div>
     </header>
     <div class="pbio">${prof.bio}</div>
