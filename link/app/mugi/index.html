@@ -32,7 +32,7 @@
   .badge { display:inline-block; background:var(--brown); color:#fff; font-weight:700; font-size:13px; padding:2px 10px; border-radius:999px; letter-spacing:.08em; }
   .product .name { font-size:14px; font-weight:700; margin-top:4px; }
   .product .price { font-size:13px; margin-top:2px; }
-  .buy { display:inline-block; background:var(--sage); color:#fff; font-weight:700; font-size:14px; text-decoration:none; padding:10px 14px; border-radius:999px; white-space:nowrap; }
+  .buys { display:flex; flex-direction:column; gap:6px; } .buy.amazon { background:#DE8A16; text-align:center; } .buy { display:inline-block; background:var(--sage); color:#fff; font-weight:700; font-size:14px; text-decoration:none; padding:10px 14px; border-radius:999px; white-space:nowrap; }
   h2.section { font-size:15px; margin:26px 2px 10px; }
   .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:3px; }
   .grid a { display:block; aspect-ratio:4/5; overflow:hidden; border-radius:6px; }
@@ -73,7 +73,10 @@ function productRow(p) {
       <div class="name">${p.name}</div>
       <div class="price">${yen(p.price)}${p.shop ? `（${p.shop}）` : ''}</div>
     </div>
-    <a class="buy" href="${buyUrl(p)}" target="_blank" rel="noopener sponsored">楽天で見る</a>
+    <div class="buys">
+      <a class="buy" href="${buyUrl(p)}" target="_blank" rel="noopener sponsored">楽天で見る</a>
+      ${p.amazon_url ? `<a class="buy amazon" href="${p.amazon_url}" target="_blank" rel="noopener sponsored">Amazonで見る</a>` : }
+    </div>
   </div>`;
 }
 
