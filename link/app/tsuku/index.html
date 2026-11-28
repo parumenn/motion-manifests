@@ -75,7 +75,7 @@ function productRow(p) {
     </div>
     <div class="buys">
       <a class="buy" href="${buyUrl(p)}" target="_blank" rel="noopener sponsored">楽天で見る</a>
-      ${p.amazon_url ? `<a class="buy amazon" href="${p.amazon_url}" target="_blank" rel="noopener sponsored">Amazonで見る</a>` : }
+      ${p.amazon_url ? `<a class="buy amazon" href="${p.amazon_url}" target="_blank" rel="noopener sponsored">Amazonで見る</a>` : ''}
     </div>
   </div>`;
 }
